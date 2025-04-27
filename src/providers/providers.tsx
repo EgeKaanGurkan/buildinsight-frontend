@@ -8,7 +8,9 @@ import {BuildInSightProvider, BuildInSight} from "buildinsight";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <BuildInSightProvider>
+      <BuildInSightProvider
+      url="http://localhost:8080"
+      projectId="testProject">
         <BuildInSight />
         <>{children}</>
       </BuildInSightProvider>
