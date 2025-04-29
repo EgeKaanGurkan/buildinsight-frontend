@@ -18,7 +18,7 @@ import {
   ShaderGradientCanvas,
 } from "@shadergradient/react"
 import { SparklesCore } from "@/components/ui/sparkles"
-import { useBuildInSight } from "buildinsight"
+import { useBuildInSight, GainInSight } from "buildinsight"
 // @ts-expect-error cant find it for some reason
 import {G} from "@shadergradient/react/dist/types-BucY9hJe";
 
@@ -173,6 +173,7 @@ export default function Home() {
         <Spotlight />
 
         {/*────────── Headline / sub copy ──────────*/}
+        <GainInSight name={"hero"}>
         <div className="md:h-[60svh] lg:h-[50svh] w-full flex-col pt-20 p-6">
           <div className="h-full flex justify-between items-center flex-col gap-8">
             <motion.p
@@ -188,19 +189,20 @@ export default function Home() {
             {/* Headline */}
             <div className="flex flex-col gap-3">
               <div className="relative group">
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.8 * animationSpeed,
-                    ease: [0.22, 1, 0.36, 1],
-                    delay: 0.4 * animationSpeed,
-                  }}
-                  className="text-8xl sm:text-5xl md:text-7xl lg:text-8xl spacing tracking-tight"
-                >
-                  Move fast and break things
-                </motion.p>
-
+                <GainInSight name={"heroText"}>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.8 * animationSpeed,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: 0.4 * animationSpeed,
+                    }}
+                    className="text-8xl sm:text-5xl md:text-7xl lg:text-8xl spacing tracking-tight"
+                  >
+                    Move fast and break things
+                  </motion.p>
+                </GainInSight>
                 <motion.div
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{
@@ -279,6 +281,7 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
+        </GainInSight>
 
         {/* filler section */}
         <div className="h-[50svh] w-full flex-col pt-40">
@@ -288,20 +291,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/*────────── Global speed slider (outside hero container) ──────────*/}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-black/60 backdrop-blur px-4 py-2 text-sm text-white">
-        <span>Speed</span>
-        <input
-          type="range"
-          min={0.2}
-          max={3}
-          step={0.1}
-          value={speed}
-          onChange={(e) => setSpeed(parseFloat(e.target.value))}
-          className="h-2 w-32 cursor-pointer accent-orange-400"
-        />
-        <span>{speed.toFixed(1)}×</span>
-      </div>
     </>
   )
 }
