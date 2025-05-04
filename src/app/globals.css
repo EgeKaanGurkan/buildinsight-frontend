@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import "tw-animate-css";
 
 @layer base {
@@ -59,16 +61,14 @@
     --chart-5: 340 75% 55%;
 
     --brand-primary: 205 100% 50%;
-
   }
 }
 
-
 @layer base {
   * {
-    /*@apply border-border outline-ring/50;*/
+    @apply border-border;
   }
   body {
-    /*@apply bg-background text-foreground;*/
+    /* @apply bg-background text-foreground; */
   }
 }
