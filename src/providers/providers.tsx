@@ -3,20 +3,25 @@
 import {ThemeProvider} from "@/providers/theme-provider"
 import React from "react";
 
-import {BuildInSightProvider, BuildInSight} from "buildinsight";
-import {QueryClient, QueryClientProvider, useQueryClient} from "react-query";
+import {BuildInsightProvider, BuildInSight} from "buildinsight";
+import {QueryClient, QueryClientProvider} from "react-query";
+import useIsMobile from "@/lib/hooks/use-is-mobile";
 
 export function Providers({children}: { children: React.ReactNode }) {
+
+
+  const isMobile = useIsMobile()
   const queryClient = new QueryClient();
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <BuildInSightProvider
-          url="http://localhost:8080"
-          projectId="testProject">
-          <BuildInSight/>
+        <BuildInsightProvider
+          projectId="testProject"
+        >
           <>{children}</>
-        </BuildInSightProvider>
+          <BuildInSight />
+        </BuildInsightProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

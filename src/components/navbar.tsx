@@ -22,7 +22,7 @@ export default function Navbar() {
     restDelta: 0.001,
   })
 
-  const width = useTransform(springScrollY, [0, 300], ["75%", "55%"])
+  const width = useTransform(springScrollY, [0, 300], ["70%", "55%"])
   const height = useTransform(springScrollY, [0, 300], ["4rem", "4rem"])
   const padding = useTransform(springScrollY, [0, 300], ["1.5rem", "1rem"])
   const logoScale = useTransform(springScrollY, [0, 300], [1, 0.9])
@@ -44,7 +44,7 @@ export default function Navbar() {
   }
 
   return (
-    <div className="fixed top-10 z-50 flex w-full justify-center">
+    <div className="fixed top-10 z-[99999999999999999999999] flex w-full justify-center">
       <motion.nav
         className={cn(
           "flex items-center justify-between rounded-md",
@@ -74,7 +74,7 @@ export default function Navbar() {
           </motion.div>
 
           <motion.span
-            className="text-xl font-bold text-white"
+            className="text-2xl font-bold text-white tracking-tight"
             style={{ opacity: brandOpacity }}
             transition={{ duration: 0.2 }}
           >
