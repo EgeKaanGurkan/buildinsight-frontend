@@ -77,6 +77,16 @@ const config: Config = {
           '0%': { 'background-position': '100%' },
           '100%': { 'background-position': '-100%' },
         },
+        spotlight: {
+          "0%": {
+            opacity: "0",
+            transform: "translate(-72%, -62%) scale(0.5)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translate(-50%,-40%) scale(1)",
+          },
+        },
         'accordion-down': {
           from: {
             height: '0'
@@ -100,13 +110,20 @@ const config: Config = {
           '100%': {
             transform: 'translateY(-100%)'
           }
-        }
+        },
+        meteor: {
+          '0%': { transform: 'rotate(200deg) translateX(0)', opacity: '0' },
+          '70%': { opacity: '1' },
+          '100%': { transform: 'rotate(200deg) translateX(-500px)', opacity: '0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'reveal-bottom-top': 'reveal-bottom-top 0.5s ease-out forwards',
         shine: 'shine 5s linear infinite',
+        meteor: 'meteor 0.2s linear infinite',
+        spotlight: "spotlight 2s ease .75s 1 forwards",
       }
     }
   },

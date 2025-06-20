@@ -1,0 +1,195 @@
+# Analytics Frontend - Cursor Rules
+
+## Project Overview
+This is a Next.js 15 analytics frontend application built with React 19, TypeScript, Tailwind CSS, and shadcn/ui components. The project features advanced UI components, animations, 3D graphics, and analytics tracking capabilities.
+
+## Technology Stack
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS with CSS variables
+- **UI Components**: shadcn/ui with Radix UI primitives
+- **Animations**: Framer Motion
+- **3D Graphics**: React Three Fiber, Three.js
+- **Icons**: Lucide React
+- **State Management**: React Query (v3)
+- **Build Tools**: ESLint, Prettier
+- **Package Manager**: npm
+
+## Code Style and Standards
+
+### TypeScript
+- Use strict TypeScript configuration
+- Prefer explicit types over `any`
+- Use proper interface definitions for props and data structures
+- Leverage TypeScript's utility types when appropriate
+- Use `type` for union types and primitives, `interface` for object shapes
+
+### React Patterns
+- Use functional components with hooks
+- Prefer composition over inheritance
+- Use React.memo() for expensive components
+- Implement proper error boundaries
+- Use Suspense for data fetching and lazy loading
+- Prefer custom hooks for reusable logic
+
+### Next.js Conventions
+- Use the App Router (src/app directory)
+- Implement proper metadata for SEO
+- Use `"use client"` directive only when necessary
+- Leverage Next.js built-in optimizations (Image, Font, etc.)
+- Follow Next.js file-based routing conventions
+
+### Component Architecture
+- Follow atomic design principles
+- Place reusable UI components in `src/components/ui/`
+- Create feature-specific components in `src/components/`
+- Use compound component patterns for complex UI elements
+- Implement proper prop interfaces with JSDoc comments
+
+### Styling Guidelines
+- Use Tailwind CSS for styling
+- Leverage CSS variables for theming (HSL format)
+- Use the `cn()` utility function for conditional classes
+- Follow mobile-first responsive design
+- Implement dark mode using `next-themes`
+- Use semantic color tokens from the design system
+
+### File Organization
+```
+src/
+├── app/                 # Next.js App Router pages
+├── components/          # Feature components
+│   └── ui/             # Reusable UI components (shadcn/ui)
+├── lib/                # Utilities and configurations
+│   └── hooks/          # Custom React hooks
+├── providers/          # Context providers
+└── api/                # API integration layer
+```
+
+### Import Conventions
+- Use absolute imports with `@/` alias
+- Group imports in this order:
+  1. External libraries
+  2. Internal components/utilities
+  3. Type imports (with `type` keyword)
+- Sort imports alphabetically within groups
+
+### Performance Best Practices
+- Use React.memo() for components that re-render frequently
+- Implement proper loading states and skeletons
+- Optimize images with Next.js Image component
+- Use dynamic imports for heavy components
+- Implement proper error handling with Error Boundaries
+
+### Animation and Interaction
+- Use Framer Motion for complex animations
+- Implement proper accessibility for animated elements
+- Provide reduced motion alternatives
+- Use semantic motion values and easing functions
+- Implement proper loading and transition states
+
+### Data Fetching
+- Use React Query for server state management
+- Implement proper loading, error, and success states
+- Use custom hooks for API calls
+- Handle errors gracefully with user-friendly messages
+- Implement proper cache invalidation strategies
+
+### Accessibility
+- Use semantic HTML elements
+- Implement proper ARIA attributes
+- Ensure keyboard navigation works correctly
+- Provide alt text for images
+- Use proper heading hierarchy
+- Test with screen readers
+
+### Code Quality
+- Use ESLint with Next.js recommended config
+- Format code with Prettier
+- Write meaningful commit messages
+- Use TypeScript strict mode
+- Implement proper error handling
+- Write unit tests for utility functions
+
+### Security
+- Sanitize user inputs
+- Use environment variables for sensitive data
+- Implement proper CORS policies
+- Validate data on both client and server
+- Use HTTPS in production
+
+## Component Guidelines
+
+### UI Components (shadcn/ui)
+- Follow shadcn/ui patterns and conventions
+- Use Radix UI primitives as base components
+- Implement proper forwarding of refs
+- Use compound component patterns
+- Provide comprehensive TypeScript interfaces
+
+### Custom Components
+- Create reusable, composable components
+- Use proper prop drilling alternatives (Context, composition)
+- Implement loading and error states
+- Use semantic HTML structure
+- Follow responsive design principles
+
+### Animation Components
+- Use Framer Motion for complex animations
+- Implement proper enter/exit animations
+- Provide accessibility considerations
+- Use semantic animation values
+- Implement proper cleanup in useEffect
+
+## Development Workflow
+
+### Code Review
+- Ensure TypeScript compilation passes
+- Check for accessibility compliance
+- Verify responsive design works
+- Test animations and interactions
+- Review performance implications
+
+### Testing Strategy
+- Write unit tests for utility functions
+- Test component rendering and interactions
+- Verify API integration works correctly
+- Test responsive design on multiple devices
+- Validate accessibility compliance
+
+### Git Conventions
+- Use conventional commit messages
+- Create feature branches for new development
+- Write meaningful pull request descriptions
+- Include screenshots for UI changes
+- Update documentation when necessary
+
+## Environment Setup
+- Use Node.js 18+ for development
+- Install dependencies with `npm install`
+- Run development server with `npm run dev`
+- Use TypeScript strict mode
+- Configure ESLint and Prettier in IDE
+
+## Naming Conventions
+- Use PascalCase for components and types
+- Use camelCase for functions and variables
+- Use kebab-case for file names
+- Use SCREAMING_SNAKE_CASE for constants
+- Use descriptive names that indicate purpose
+
+## Error Handling
+- Implement proper error boundaries
+- Provide user-friendly error messages
+- Log errors appropriately for debugging
+- Use proper HTTP status codes
+- Handle loading and error states gracefully
+
+## Performance Monitoring
+- Monitor Core Web Vitals
+- Implement proper analytics tracking
+- Use React DevTools for debugging
+- Monitor bundle size and optimize accordingly
+- Implement proper caching strategies
+
+Remember: Write code that is readable, maintainable, and follows the established patterns in this codebase. When in doubt, refer to the existing implementation patterns in the project. 

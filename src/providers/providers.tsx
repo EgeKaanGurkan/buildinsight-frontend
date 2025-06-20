@@ -1,19 +1,32 @@
 "use client"
 
-import { ThemeProvider } from "@/providers/theme-provider"
+import {ThemeProvider} from "@/providers/theme-provider"
 import React from "react";
 
-import {BuildInSightProvider, BuildInSight} from "buildinsight";
+import {BuildInsightProvider, BuildInSight} from "buildinsight";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import useIsMobile from "@/lib/hooks/use-is-mobile";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({children}: { children: React.ReactNode }) {
+
+
+  const isMobile = useIsMobile()
+  const queryClient = new QueryClient();
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <BuildInSightProvider
-      url="http://localhost:8080"
-      projectId="testProject">
-        <BuildInSight />
-        <>{children}</>
-      </BuildInSightProvider>
+    
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
+      <QueryClientProvider client={queryClient}>
+        <BuildInsightProvider
+          projectId="testProject"
+        >
+          <>{children}</>
+          <BuildInSight triggerVariant={isMobile ? "sticky" : "default"} expandedVariant={isMobile ? "bottom-fixed" : "default"}/>
+        </BuildInsightProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   )
 }
+
+// section#hero > div.md:h-[60svh].lg:h-[50svh].w-full.flex-col.pt-20.p-6 > div.h-full.flex.justify-between.items-center.flex-col.gap-8 > div.flex.flex-col.gap-3 > div.relative.group > div
+// section#hero > div.md:h-[60svh].lg:h-[50svh].w-full.flex-col.pt-20.p-6 > div.h-full.flex.justify-between.items-center.flex-col.gap-8 > div.flex.flex-col.gap-3 > div.relative.group > div > p.text-8xl.sm:text-5xl.md:text-7xl.lg:text-8xl.spacing.tracking-tight

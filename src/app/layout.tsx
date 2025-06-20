@@ -4,6 +4,7 @@ import { Providers } from "@/providers/providers"
 import type React from "react"
 import { InterFont } from "@/lib/fonts"
 import Navbar from "@/components/navbar"
+import { BreakpointIndicator } from "@/components/BreakpointIndicator"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,6 +22,7 @@ export default function RootLayout({
     <Providers>
       <Navbar />
       {children}
+      <BreakpointIndicator />
     </Providers>
     </body>
     </html>

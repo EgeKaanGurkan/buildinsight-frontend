@@ -1,4 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Analytics Frontend
+
+This is a Next.js 15 analytics frontend application built with React 19, TypeScript, Tailwind CSS, and shadcn/ui components.
+
+## npmrc Configuration
+
+This project supports multiple npm registry configurations for different environments:
+
+### Files
+- `.npmrc` - Active configuration (used by npm)
+- `.npmrc.local` - Local development configuration (public npm registry)
+- `.npmrc.example` - Template showing both configurations
+- `scripts/npmrc-switch.sh` - Script to switch between configurations
+
+### Usage
+
+#### Switch to Local Development
+```bash
+npm run npmrc:local
+```
+This switches to use the public npm registry for local development.
+
+#### Switch to CodeArtifact (for Amplify deployments)
+```bash
+npm run npmrc:codeartifact
+```
+This switches to use AWS CodeArtifact for deployments.
+
+#### Check Current Configuration
+```bash
+npm run npmrc:status
+```
+This shows the current `.npmrc` configuration.
+
+#### Restore Previous Configuration
+```bash
+npm run npmrc:restore
+```
+This restores the previous `.npmrc` configuration from backup.
+
+### Manual Usage
+You can also use the shell script directly:
+```bash
+./scripts/npmrc-switch.sh local      # Switch to local
+./scripts/npmrc-switch.sh codeartifact # Switch to CodeArtifact
+./scripts/npmrc-switch.sh status     # Show current config
+./scripts/npmrc-switch.sh restore    # Restore previous config
+```
+
+### Environment Variables for CodeArtifact
+When using CodeArtifact, ensure these environment variables are set:
+- `CODEARTIFACT_DOMAIN`
+- `AWS_ACCOUNT_ID`
+- `AWS_REGION`
+- `CODEARTIFACT_REPO`
+- `CODEARTIFACT_AUTH_TOKEN`
 
 ## Getting Started
 
