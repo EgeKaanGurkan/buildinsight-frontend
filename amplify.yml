@@ -1,0 +1,21 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - ': "${CODEARTIFACT_DOMAIN:?Need to set CODEARTIFACT_DOMAIN}"'
+        - ': "${AMAZON_ACCOUNT_ID:?Need to set AMAZON_ACCOUNT_ID}"'
+        - ': "${AMAZON_REGION:?Need to set AMAZON_REGION}"'
+        - 'TOKEN=$(aws codeartifact get-authorization-token --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AMAZON_ACCOUNT_ID" --region "$AMAZON_REGION" --query authorizationToken --output text)'
+        - 'export CODEARTIFACT_AUTH_TOKEN=$TOKEN'
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - ~/.npm/**/*
