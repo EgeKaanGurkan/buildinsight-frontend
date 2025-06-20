@@ -4,7 +4,7 @@ import {ThemeProvider} from "@/providers/theme-provider"
 import React from "react";
 
 import {BuildInsightProvider, BuildInSight} from "buildinsight";
-import {QueryClient, QueryClientProvider} from "react-query";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import useIsMobile from "@/lib/hooks/use-is-mobile";
 
 export function Providers({children}: { children: React.ReactNode }) {
@@ -14,13 +14,14 @@ export function Providers({children}: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark">
+    
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
       <QueryClientProvider client={queryClient}>
         <BuildInsightProvider
           projectId="testProject"
         >
           <>{children}</>
-          <BuildInSight />
+          <BuildInSight triggerVariant={isMobile ? "sticky" : "default"} expandedVariant={isMobile ? "bottom-fixed" : "default"}/>
         </BuildInsightProvider>
       </QueryClientProvider>
     </ThemeProvider>

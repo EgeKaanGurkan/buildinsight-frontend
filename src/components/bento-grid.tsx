@@ -3,6 +3,7 @@ import HeatmapOverlay from "@/components/heatmap-overlay";
 import React from "react";
 import VersionHistoryMockup from "@/components/version-history-mockup";
 import { motion } from "motion/react";
+import ChromaInlineText from "./chroma-text";
 
 export default function BentoGrid() {
   const containerVariants = {
@@ -34,7 +35,12 @@ export default function BentoGrid() {
   };
 
   return (
-    <section className="w-full flex justify-center items-center py-16 px-4">
+    <section id="features" className="w-full flex items-center bg-background flex-col gap-6 mt-16">
+      <h2
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-primary w-full max-w-7xl"
+      >
+        <ChromaInlineText theme="dark" text="Features" duration={1} gradientBlur="0px" className="font-medium" />
+      </h2>
       <motion.div 
         className="grid grid-cols-1 md:grid-cols-12 gap-8 w-full max-w-7xl tracking-tight"
         variants={containerVariants}
@@ -58,7 +64,7 @@ export default function BentoGrid() {
           <div className="relative z-[10]">
             <h2 className="text-2xl sm:text-3xl font-semibold text-white mb-2">View feedback on your live website</h2>
             <p className="text-white/90 text-sm sm:text-base">
-              Gather feedback with utmost detail and precision from your end users, then view them on your live domain.
+              Gather feedback with utmost detail and precision from your end users or UI/UX designers, then view them on your live domain.
             </p>
           </div>
         </motion.div>

@@ -172,7 +172,6 @@ function Band({ maxSpeed = 50, minSpeed = 10, name, email }: { maxSpeed?: number
           <group
             scale={1.5}
             position={[0, -0.4, -0.05]}
-            rotation={[0, 0, 0]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={(e) => (e.target.releasePointerCapture(e.pointerId), drag(false))}
@@ -190,7 +189,10 @@ function Band({ maxSpeed = 50, minSpeed = 10, name, email }: { maxSpeed?: number
                 clearcoat={0.8}
                 clearcoatRoughness={0.2}
               />
-              <Html transform position={[0, 0.3, 0.002]} rotation={[0, 0, 0]} scale={0.1} wrapperClass="flex">
+            </mesh>
+
+            {/* HTML Content Overlay - UPDATED with new layout */}
+            <Html transform occlude position={[0, 0, 0.02]} rotation={[0, 0, 0]} scale={0.1} wrapperClass="flex">
               <div
                 className="flex flex-col justify-between text-black tracking-tighter select-none overflow-hidden p-6 pointer-events-none"
                 style={{ width: "400px", height: "500px" }}
@@ -218,10 +220,6 @@ function Band({ maxSpeed = 50, minSpeed = 10, name, email }: { maxSpeed?: number
                 </div>
               </div>
             </Html>
-            </mesh>
-
-            {/* HTML Content Overlay - UPDATED with new layout */}
-            
 
             <mesh position={[0, 1.0, 0.02]}>
               <boxGeometry args={[0.3, 0.1, 0.05]} />

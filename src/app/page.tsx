@@ -1,14 +1,9 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
-import {
-  useEffect,
-  useState, // ← NEW
-  useRef,
-} from "react"
-import { useBuildInSight, GainInSight, Spotlight } from "buildinsight"
-import { useStripeCreateCheckoutSession } from "@/api/hooks/stripe"
-import { useRouter } from "next/navigation"
+import { motion, AnimatePresence, useScroll } from "framer-motion"
+import { useEffect, useState, useRef, Suspense } from "react"
+import { useBuildInSight, GainInSight } from "buildinsight"
+import Spline from "@splinetool/react-spline"
 import {
   CodeBlock,
   CodeBlockBody,
@@ -33,10 +28,14 @@ import { Label } from "@/components/ui/label"
 import { NpmIcon, PnpmIcon, YarnIcon } from "@/components/icons"
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react"
 import type { BundledLanguage } from "@/components/ui/code-block"
-import BentoGrid from "@/components/bento-grid"
 import useIsMobile from "@/lib/hooks/use-is-mobile"
-import Lanyard from "@/components/lanyard"
 import { ShareIcon } from "lucide-react"
+import type { Application } from "@splinetool/runtime"
+import ChromaInlineText from "@/components/chroma-text"
+import { useNewsletterSignup } from "@/api/hooks/newsletter"
+import { useForm } from "react-hook-form"
+import { Checkbox } from "@/components/ui/checkbox"
+import HowItWorksSection from "@/components/how-it-works-section"
 
 type typeT = "plane" | "sphere" | "waterPlane"
 
@@ -85,18 +84,15 @@ export default function Home() {
   const animationSpeed = 0.6 / speed // re-use everywhere
 
   // Add state for lanyard form
-  const [nameInput, setNameInput] = useState("")
-  const [emailInput, setEmailInput] = useState("")
   const [formSubmitted, setFormSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  // const [submittedData, setSubmittedData] = useState<{ name: string; email: string } | null>({name: "Efe Barlas", email: "efe@buildsinsight.dev"})
   const [submittedData, setSubmittedData] = useState<{ name: string; email: string } | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
 
   // const router = useRouter()
   const isMobile = useIsMobile()
 
   /* ─────────────── BuildInsight click log ─────────── */
-  const { clickedElements, setIsTriggerVisible, isTriggerVisible, isExpandedVisible, setIsExpandedVisible } = useBuildInSight()
+  const { clickedElements, setIsTriggerVisible, isTriggerVisible, isExpandedVisible } = useBuildInSight()
   useEffect(() => console.log(clickedElements), [clickedElements])
 
   // const stripeCreateCheckoutSessionMutation = useStripeCreateCheckoutSession()
@@ -116,6 +112,7 @@ export default function Home() {
 
   // Split headline into words for staggered animation
   const headlineWords = ["Understand", "exactly", "what", "users", "want", "from", "your", "website"]
+  const spline = useRef<Application>(null)
 
   // Snippet commands and state for tabs
   const commands = [
@@ -141,52 +138,96 @@ export default function Home() {
   const waitlistRef = useRef<HTMLDivElement>(null)
   const [isAutoScrolling, setIsAutoScrolling] = useState(false)
 
-  useEffect(() => {
-    // if (!isMobile) {
-      // setIsTriggerVisible(true)
-    // }
+  const [splineLoaded, setSplineLoaded] = useState(false)
 
-    // setIsExpandedVisible(true)
-  }, [])
+  // Framer Motion useScroll for mobile trigger
+  const { scrollY } = useScroll()
+  const [hasPassedHalf, setHasPassedHalf] = useState(false)
+
+  const newsLetterForm = useForm<{ email: string, name: string, consentForDevelopmentUpdates: boolean }>({
+    defaultValues: {
+      email: "",
+      name: "",
+      consentForDevelopmentUpdates: false,
+    },
+  })
+  const { register, handleSubmit, reset, formState } = newsLetterForm
+
+  const newsletterSignupMutation = useNewsletterSignup()
+
+  const handleNewsletterSignup = (data: { email: string, name: string, consentForDevelopmentUpdates: boolean }) => {
+    setFormError(null)
+    newsletterSignupMutation.mutate(
+      {
+        email: data.email,
+        name: data.name,
+        consentForDevelopmentUpdates: data.consentForDevelopmentUpdates,
+      },
+      {
+        onSuccess: () => {
+          setSubmittedData({ name: data.name, email: data.email })
+          setFormSubmitted(true)
+          reset()
+        },
+        onError: () => {
+          setFormError("Something went wrong. Please try again.")
+        },
+      }
+    )
+  }
+
+  useEffect(() => {
+    if (!isMobile) return
+    const handle = scrollY.on("change", (v) => {
+      const half = window.innerHeight * 0.1
+      if (v > half && !hasPassedHalf) {
+        setIsTriggerVisible(true)
+        setHasPassedHalf(true)
+      } else if (v <= half && hasPassedHalf) {
+        setIsTriggerVisible(false)
+        setHasPassedHalf(false)
+      }
+    })
+    return () => handle && handle()
+  }, [isMobile, scrollY, hasPassedHalf, setIsTriggerVisible])
+
+  function onLoad(splineApp: Application) {
+    // Store the spline application instance in a ref
+    spline.current = splineApp
+
+    spline.current.setVariable("name", submittedData?.name || "Enter On Form")
+    spline.current.setVariable("email", submittedData?.email || "Enter On Form")
+    setSplineLoaded(true)
+  }
 
   /* ─────────────── JSX ─────────────────────────────── */
   return (
     <>
       {/*────────── Hero Section ──────────*/}
-      <section id="hero" className={"bg-background"}>
+      <section id="home" className={"bg-background p-8 md:p-12"}>
         {/* Shader canvas */}
         {/* {MemoizedSparkles} */}
         {/* <Spotlight /> */}
 
         {/*────────── Headline / sub copy ──────────*/}
         {/* <Spotlight
-        className="-top-40 left-0 md:-top-20 md:left-60"
-        fill="white"
-      /> */}
+      className="-top-40 left-0 md:-top-20 md:left-60"
+      fill="white"
+    /> */}
         <GainInSight name={"hero"}>
-          <div className="h-full w-full flex-col pt-14 p-6 relative">
+          <div className="h-full w-full flex-col pt-24 relative">
             <div className="absolute top-0 left-0 w-full h-full z-[-11] bg-black ">
-              {/*<ShaderGradientCanvas*/}
-              {/*  style={{*/}
-              {/*    position: 'absolute',*/}
-              {/*    top: 0,*/}
-              {/*  }}*/}
-              {/*  lazyLoad={true}*/}
-              {/*  pointerEvents="none"*/}
-              {/*>*/}
-              {/*  <ShaderGradient {...bgShaderConfig} />*/}
-              {/*</ShaderGradientCanvas>*/}
             </div>
-            <div className="h-full flex justify-center items-center flex-col gap-12 pt-24">
+            <div className="h-full flex justify-center items-center flex-col gap-12">
               {/* <motion.p
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8 * animationSpeed,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl spacing tracking-tight"
-          ></motion.p> */}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.8 * animationSpeed,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl spacing tracking-tight"
+        ></motion.p> */}
 
               {/* Headline */}
               <div className="flex max-w-[80rem] gap-12">
@@ -213,27 +254,37 @@ export default function Home() {
                               //     : {}
                               // }
                             >
-                              {word}
+                              {word === "exactly" || word === "want" ? (
+                                <ChromaInlineText
+                                  delay={word === "exactly" ? 0.6 : 0.9}
+                                  duration={0.8}
+                                  gradientBlur="0px"
+                                  theme="dark"
+                                  text={word}
+                                />
+                              ) : (
+                                word
+                              )}
                             </motion.span>
                           </div>
                         ))}
                       </div>
                     </div>
                     {/* <motion.p
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.8 * animationSpeed,
-                      delay: 1.2 * animationSpeed,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className={cn(
-                      "text-lg sm:text-2xl md:text-3xl lg:text-5xl spacing font-medium tracking-tight",
-                      PlayfairDisplayFont.className,
-                    )}
-                  >
-                    with insight
-                  </motion.p> */}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.8 * animationSpeed,
+                    delay: 1.2 * animationSpeed,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className={cn(
+                    "text-lg sm:text-2xl md:text-3xl lg:text-5xl spacing font-medium tracking-tight",
+                    PlayfairDisplayFont.className,
+                  )}
+                >
+                  with insight
+                </motion.p> */}
                   </div>
 
                   {/* Sub-headline */}
@@ -285,19 +336,19 @@ export default function Home() {
                             },
                           }}
                           onClick={async () => {
-                            const prev = isTriggerVisible;
-                            setIsTriggerVisible(false);
-                            setIsAutoScrolling(true);
+                            const prev = isTriggerVisible
+                            setIsTriggerVisible(false)
+                            setIsAutoScrolling(true)
                             if (waitlistRef?.current) {
                               const handle = () => {
                                 setTimeout(() => {
-                                  setIsTriggerVisible(prev);
-                                  setIsAutoScrolling(false);
-                                }, 500);
-                                window.removeEventListener('scroll', handle);
-                              };
-                              window.addEventListener('scroll', handle);
-                              waitlistRef.current.scrollIntoView({ behavior: 'smooth' });
+                                  setIsTriggerVisible(prev)
+                                  setIsAutoScrolling(false)
+                                }, 500)
+                                window.removeEventListener("scroll", handle)
+                              }
+                              window.addEventListener("scroll", handle)
+                              waitlistRef.current.scrollIntoView({ behavior: "smooth" })
                             }
                           }}
                         >
@@ -305,21 +356,21 @@ export default function Home() {
                           <span>→</span>
                         </motion.button>
                         {/* <motion.button
-                      className="relative text-black font-medium py-2 px-6 rounded-md border border-gray-300 hover:border-gray-400 bg-white flex items-center gap-2 transition-colors"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{
-                        scale: {
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 17,
-                        },
-                      }}
-                      onClick={() => setIsVisible(true)}
-                    >
-                      <span>Try Live</span>
-                      <SquareDashedMousePointer className="h-4 w-4" />
-                    </motion.button> */}
+                    className="relative text-black font-medium py-2 px-6 rounded-md border border-gray-300 hover:border-gray-400 bg-white flex items-center gap-2 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{
+                      scale: {
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 17,
+                      },
+                    }}
+                    onClick={() => setIsVisible(true)}
+                  >
+                    <span>Try Live</span>
+                    <SquareDashedMousePointer className="h-4 w-4" />
+                  </motion.button> */}
                       </motion.div>
                     </motion.div>
                   </motion.div>
@@ -382,13 +433,13 @@ import React from "react";
 import {BuildInsightProvider} from "buildinsight";
 
 export function Providers({children}: { children: React.ReactNode }) {
-return (
-  <BuildInsightProvider
-    projectId="4083aef7-122e-49b3-8a23-8b0e59f67594"
-  >
-    <>{children}</>
-  </BuildInsightProvider>
-)
+  return (
+    <BuildInsightProvider
+      projectId="4083aef7-122e-49b3-8a23-8b0e59f67594"
+    >
+      <>{children}</>
+    </BuildInsightProvider>
+  )
 }`,
                           },
                         ]}
@@ -425,9 +476,11 @@ return (
               <div
                 className={"relative flex w-full h-[45svh] overflow-hidden rounded-md max-w-[95%] group"}
                 onMouseEnter={() => {
-                  if (!isAutoScrolling) setIsTriggerVisible(true)
+                  if (!isAutoScrolling && !isMobile) setIsTriggerVisible(true)
                 }}
-                onMouseLeave={() => setIsTriggerVisible(false)}
+                onMouseLeave={() => {
+                  if (!isAutoScrolling && !isMobile) setIsTriggerVisible(false)
+                }}
               >
                 <motion.div
                   initial={{ opacity: 0, y: 60 }}
@@ -446,7 +499,7 @@ return (
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.3, ease: [0, 1, 0, 1] }}
                           >
-                            Hover over to try!
+                            {isMobile ? "Scroll to try!" : "Hover over to try!"}
                           </motion.span>
                         )}
                         {isTriggerVisible && !isExpandedVisible && (
@@ -458,11 +511,17 @@ return (
                             transition={{ duration: 0.3, ease: [0, 1, 0, 1] }}
                             className="flex items-center gap-2"
                           >
-                            <span>Press</span>
-                            <kbd className="size-7 text-gray-800 bg-white border border-gray-300 rounded-md shadow-sm flex items-center justify-center text-lg font-mono">
-                              Y
-                            </kbd>
-                            <span>on your keyboard to give insight.</span>
+                            {isMobile ? (
+                              <span>Tap on the rainbow element below!</span>
+                            ) : (
+                              <>
+                                <span>Press</span>
+                                <kbd className="size-7 text-gray-800 bg-white border border-gray-300 rounded-md shadow-sm flex items-center justify-center text-lg font-mono">
+                                  Y
+                                </kbd>
+                                <span>on your keyboard to give insight.</span>
+                              </>
+                            )}
                           </motion.div>
                         )}
                         {isExpandedVisible && (
@@ -473,7 +532,7 @@ return (
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.3, ease: [0, 1, 0, 1] }}
                           >
-                            Click on any element on the page!
+                            {isMobile ? "Tap on any element on the page!" : "Click on any element on the page!"}
                           </motion.span>
                         )}
                       </AnimatePresence>
@@ -504,141 +563,184 @@ return (
           </div>
         </GainInSight>
       </section>
+      {/*────────── How It Works Section ──────────*/}
+      <HowItWorksSection />
       {/*────────── Bento Grid Section ──────────*/}
-      <BentoGrid />
+      
       {/* Lanyard Form and 3D Card */}
-      <div ref={waitlistRef} className="h-screen w-full flex flex-col items-center justify-center gap-8 relative">
+      <div
+        id="waitlist"
+        ref={waitlistRef}
+        className="h-screen w-full flex flex-col items-center justify-center gap-8 relative bg-background"
+      >
         <AnimatePresence mode="wait">
-          {!formSubmitted ? (
+          {!formSubmitted && !splineLoaded ? (
             <motion.div
               key="waitlist-form"
               initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="w-full max-w-xl p-8 space-y-6 rounded-xl flex-col"
+              className="w-full max-w-xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 rounded-xl flex-col mx-4"
             >
               <div className="text-center">
-                <div className="relative mb-4">
-                  <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium text-primary/90 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] bg-gradient-to-b from-primary/20 to-primary/10 border border-primary/30 backdrop-blur-sm">
-                    <span className="flex items-center gap-1.5">
+                <div className="relative mb-3 sm:mb-4">
+                  <div className="inline-flex text-left rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-medium text-primary/90 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] bg-gradient-to-b from-primary/20 to-primary/10 border border-primary/30 backdrop-blur-sm">
+                    <span className="flex items-center gap-1 sm:gap-1.5">
                       <span className="relative top-px">Claim your early bird lanyard badge for special surprises</span>
                     </span>
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-card-foreground">Join Our Early Bird Waitlist!</h2>
-                <p className="text-muted-foreground">Get updates on new features, influence development and get special pricing on launch. Of course, you will be the first to know!</p>
+                <h2 className="text-2xl sm:text-3xl font-bold text-card-foreground">Join Our <ChromaInlineText text="Early Bird" delay={0.6} duration={1} gradientBlur="0px" /> Waitlist!</h2>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Get updates on new features, influence development and get special pricing on launch. Of course, you
+                  will be the first to know!
+                </p>
               </div>
               <form
-                className="space-y-6"
-                onSubmit={async (e) => {
-                  e.preventDefault()
-                  setLoading(true)
-                  // Mock API call
-                  await new Promise((resolve) => setTimeout(resolve, 1200))
-                  setSubmittedData({ name: nameInput, email: emailInput })
-                  setFormSubmitted(true)
-                  setLoading(false)
-                  setNameInput("")
-                  setEmailInput("")
-                }}
+                className="space-y-4 sm:space-y-6"
+                onSubmit={handleSubmit(handleNewsletterSignup)}
               >
-                <div className="space-y-2">
-                  <Label htmlFor="name-waitlist" className="text-card-foreground">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="name-waitlist" className="text-card-foreground text-sm sm:text-base">
                     Name
                   </Label>
                   <Input
                     id="name-waitlist"
                     type="text"
                     placeholder="Enter your name"
-                    value={nameInput}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    className="bg-background text-foreground placeholder:text-muted-foreground"
+                    {...register("name", { required: true })}
+                    className="bg-background text-foreground placeholder:text-muted-foreground text-sm sm:text-base py-2 sm:py-2.5"
                     required
-                    disabled={loading}
+                    disabled={formState.isSubmitting}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email-waitlist" className="text-card-foreground">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="email-waitlist" className="text-card-foreground text-sm sm:text-base">
                     Email
                   </Label>
                   <Input
                     id="email-waitlist"
                     type="email"
                     placeholder="you@example.com"
-                    value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
-                    className="bg-background text-foreground placeholder:text-muted-foreground"
+                    {...register("email", { required: true })}
+                    className="bg-background text-foreground placeholder:text-muted-foreground text-sm sm:text-base py-2 sm:py-2.5"
                     required
-                    disabled={loading}
+                    disabled={formState.isSubmitting}
                   />
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={loading}
-                >
-                  {loading ? "Joining..." : "Join Waitlist"}
-                </Button>
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="consent-updates"
+                    {...register("consentForDevelopmentUpdates")}
+                    checked={newsLetterForm.watch("consentForDevelopmentUpdates")}
+                    onCheckedChange={value => newsLetterForm.setValue("consentForDevelopmentUpdates", Boolean(value))}
+                    disabled={formState.isSubmitting}
+                  />
+                  <div className="grid gap-2">
+                    <Label htmlFor="consent-updates">I want to receive development updates</Label>
+                    <p className="text-muted-foreground text-sm">
+                      We will reach out on a regular interval to inform you about development updates, ask for feedback on new features and even more exclusive offers. No spam, ever.
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  {formError && (
+                    <div className="w-full flex justify-center mb-2">
+                      <span className="inline-block text-red-400 text-xs sm:text-sm font-medium px-3 py-1 rounded-md animate-shake">
+                        {formError}
+                      </span>
+                    </div>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base py-2 sm:py-2.5"
+                    disabled={formState.isSubmitting}
+                  >
+                    {formState.isSubmitting ? "Joining..." : "Join Waitlist"}
+                  </Button>
+                  
+                </div>
+                
               </form>
+              
             </motion.div>
           ) : (
-          <motion.div
+            <motion.div
               key="lanyard-success"
               initial={{ opacity: 0, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="w-full flex flex-col items-center justify-center"
+              className="w-full h-full flex flex-col items-center justify-center"
             >
               {/* <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-card-foreground">Welcome to the Waitlist!</h2>
-                <p className="text-muted-foreground">Thank you for joining, {submittedData?.name}!</p>
-              </div> */}
-              <motion.div initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 0 }} transition={{ duration: 0.5, ease: "easeInOut" }} className="w-full flex items-center justify-center">
-                <Lanyard name={submittedData?.name} email={submittedData?.email} />
+              <h2 className="text-3xl font-bold text-card-foreground">Welcome to the Waitlist!</h2>
+              <p className="text-muted-foreground">Thank you for joining, {submittedData?.name}!</p>
+            </div> */}
+              <motion.div
+                initial={{ opacity: 0, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="w-full h-full flex items-center justify-center"
+              >
+                {/* <Lanyard name={submittedData?.name} email={submittedData?.email} /> */}
+                <Suspense
+                  fallback={
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-10 h-10 border-t-transparent border-b-transparent border-r-transparent border-l-transparent border-t-white border-r-white border-b-white border-l-white rounded-full animate-spin"></div>
+                      </div>
+                    </div>
+                  }
+                >
+                  <Spline scene="https://prod.spline.design/dFaAOCAFh-2P0Lon/scene.splinecode" onLoad={onLoad} />
+                </Suspense>
               </motion.div>
             </motion.div>
           )}
-
-          
         </AnimatePresence>
-        
-        {formSubmitted && (
+
+        {formSubmitted && splineLoaded && (
+          <motion.div
+            initial={{ opacity: 0, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="absolute z-[9999999999999999999999999999999] top-0 left-0 w-full h-full flex flex-col items-center justify-end pointer-events-none"
+          >
             <motion.div
-              initial={{ opacity: 0, y: 0 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute z-[9999999999999999999999999999999] top-0 left-0 w-full h-full flex flex-col items-center justify-end pointer-events-none"
-            >
-              <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 0 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-row px-5 bg-transparent mb-24  w-full justify-center pointer-events-auto">
-                <div className="grid grid-cols-12 w-full max-w-3xl">
-                  <div className="col-span-12  px-5 py-2">
-                    <h2 className="text-4xl tracking-tight font-medium text-card-foreground">Thank you for joining, {submittedData?.name.split(" ")[0]}! We can't wait to hear your thoughts.</h2>
-                  </div>
-                  <div className="col-span-12 px-5 py-2">
-                    <p className="text-muted-foreground">We will be in touch soon about development updates, early access and special pricing on launch.</p>
-                  </div>
-                  <div className="col-span-4 px-5 py-2">
-                    <div className="flex flex-row gap-2">
-                      <Button className="m-0" variant={"secondary"}>
-                        <ShareIcon className="w-4 h-4" />
-                        Share a Link to Your Tag
-                      </Button>
-                    </div>
+              className="flex flex-row px-4 sm:px-5 bg-transparent mb-8 sm:mb-12 2xl:mb-24 w-full justify-center pointer-events-auto"
+            >
+              <div className="grid grid-cols-12 w-full max-w-3xl gap-y-2 gap-x-4">
+                <div className="col-span-12">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl tracking-tight font-medium text-card-foreground">
+                    <ChromaInlineText theme="dark" text={`Thank you for joining, ${submittedData?.name.split(" ")[0]}!`} delay={0.6} duration={1} gradientBlur="0px" className="font-medium" />&nbsp;
+                    We can&apos;t wait to hear your thoughts.
+                  </h2>
+                </div>
+                <div className="col-span-12">
+                  <p className="text-sm sm:text-base text-muted-foreground">
+                    We will be in touch soon about development updates, early access and special pricing on launch.
+                  </p>
+                </div>
+                <div className="col-span-12 sm:col-span-6 md:col-span-4">
+                  <div className="flex flex-row gap-2">
+                    <Button className="m-0 w-full sm:w-auto text-sm sm:text-base" variant={"secondary"}>
+                      <ShareIcon className="w-4 h-4 mr-2" />
+                      Share a Link to Your Tag
+                    </Button>
                   </div>
                 </div>
-                {/* <p className="text-muted-foreground">We will be in touch soon.</p>
-                <Button onClick={() => setFormSubmitted(false)}>Back to Waitlist</Button> */}
-              </motion.div>
+              </div>
             </motion.div>
-          )}
+          </motion.div>
+        )}
       </div>
     </>
   )

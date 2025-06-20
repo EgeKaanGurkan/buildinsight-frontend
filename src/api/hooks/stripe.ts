@@ -1,4 +1,4 @@
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api";
 
 interface CreatePaymentIntentParams {
@@ -16,9 +16,9 @@ export const useStripeCreatePaymentIntent = () => {
     PaymentIntentResponse,
     unknown,
     CreatePaymentIntentParams
-  >(
-    ["stripe-create-payment-intent"],
-    async ({ productId, currencySymbol = "eur", customerId }) => {
+  >({
+    mutationKey: ["stripe-create-payment-intent"],
+    mutationFn: async ({ productId, currencySymbol = "eur", customerId }) => {
       const response = await apiClient.post<PaymentIntentResponse>(
         "/stripe/payment-intent",
         {
@@ -29,15 +29,13 @@ export const useStripeCreatePaymentIntent = () => {
       );
       return response.data;
     },
-    {
-      onMutate: () => {
-        // Your code to handle the mutation when it's running
-      },
-      onError: () => {
-        // Your code to handle errors
-      },
-    }
-  );
+    onMutate: () => {
+      // Your code to handle the mutation when it's running
+    },
+    onError: () => {
+      // Your code to handle errors
+    },
+  });
 };
 
 interface CreateCheckoutSessionParams {
@@ -57,9 +55,9 @@ export const useStripeCreateCheckoutSession = () => {
     CheckoutSessionResponse,
     unknown,
     CreateCheckoutSessionParams
-  >(
-    ["stripe-create-checkout-session"],
-    async ({ productId, priceId, successUrl, cancelUrl, customerId }) => {
+  >({
+    mutationKey: ["stripe-create-checkout-session"],
+    mutationFn: async ({ productId, priceId, successUrl, cancelUrl, customerId }) => {
       const response = await apiClient.post<CheckoutSessionResponse>(
         "/stripe/checkout",
         {
@@ -72,13 +70,11 @@ export const useStripeCreateCheckoutSession = () => {
       );
       return response.data;
     },
-    {
-      onMutate: () => {
-        // Your code to handle the mutation when it's running
-      },
-      onError: () => {
-        // Your code to handle errors
-      },
-    }
-  );
+    onMutate: () => {
+      // Your code to handle the mutation when it's running
+    },
+    onError: () => {
+      // Your code to handle errors
+    },
+  });
 };
