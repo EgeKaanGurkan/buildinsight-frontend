@@ -101,7 +101,7 @@ export default function Navbar() {
     })
 
     return () => observer.disconnect()
-  }, [isManualScroll, sectionMap])
+  }, [isManualScroll])
 
   // Reset manual scroll flag after a delay
   useEffect(() => {
@@ -153,7 +153,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="fixed top-10 z-[99999999999999999999999] flex w-full justify-center">
+      <div className="fixed top-10 z-[999999999] flex w-full justify-center">
         <motion.nav
           className={cn(
             "flex items-center justify-between rounded-2xl max-w-6xl mx-auto",
