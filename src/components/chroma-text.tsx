@@ -1,7 +1,7 @@
 "use client"
 
 import { type ElementType, type HTMLAttributes, useEffect, useMemo, useRef } from "react"
-import { motion, useAnimation, type HTMLMotionProps, useInView } from "framer-motion"
+import { motion, useAnimation, type HTMLMotionProps, useInView, type Variants } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface ChromaInlineTextProps extends HTMLAttributes<HTMLSpanElement> {
@@ -46,10 +46,10 @@ export default function ChromaInlineText({
     return `linear-gradient(90deg, ${base} 0%, ${base} 25%, #A443EA 40%, #EE4574 45%, #FB7E29 50%, #e1e1fe 55%, #0358f7 60%, ${base} 75%, ${base} 100%)`
   }, [themeColors.textBaseColor])
 
-  const MotionTag = motion[Tag as keyof typeof motion] as ElementType<HTMLMotionProps<any>>
+  const MotionTag = motion[Tag as keyof typeof motion] as ElementType<HTMLMotionProps<"span">>
 
   // Variants for the bottom layer (blurred gradient)
-  const gradientLayerVariants = {
+  const gradientLayerVariants: Variants = {
     initial: {
       backgroundPosition: "120% 0",
       filter: `blur(${gradientBlur})`,

@@ -2,7 +2,7 @@ import SkeletonMockup from "@/components/skeleton-mockup";
 import HeatmapOverlay from "@/components/heatmap-overlay";
 import React from "react";
 import VersionHistoryMockup from "@/components/version-history-mockup";
-import { motion } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import ChromaInlineText from "./chroma-text";
 
 export default function BentoGrid() {
@@ -17,7 +17,7 @@ export default function BentoGrid() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: 60,

@@ -68,7 +68,7 @@ export default function PricingSection() {
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Simple, transparent pricing</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Choose the perfect plan for your needs. Always know what you'll pay.
+          Choose the perfect plan for your needs. Always know what you&apos;ll pay.
         </p>
 
         <div className="flex items-center justify-center mt-8 space-x-3">

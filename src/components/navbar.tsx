@@ -5,7 +5,7 @@ import Link from "next/link"
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Plus, X, Play } from "lucide-react"
+import { ArrowRight, Plus, X } from "lucide-react"
 import useIsMobile from "@/lib/hooks/use-is-mobile"
 import ChromaInlineText from "./chroma-text"
 
@@ -101,7 +101,7 @@ export default function Navbar() {
     })
 
     return () => observer.disconnect()
-  }, [isManualScroll])
+  }, [isManualScroll, sectionMap])
 
   // Reset manual scroll flag after a delay
   useEffect(() => {

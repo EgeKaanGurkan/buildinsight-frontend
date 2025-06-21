@@ -38,10 +38,13 @@ export default function HowItWorksSection() {
             <ChromaInlineText theme="dark" text="How it works" duration={1} gradientBlur="0px" className="font-medium" />
           </h2>
 
-          <p className="text-lg sm:text-xl text-muted-foreground">
-            Integrating <ChromaInlineText text="buildinsight" delay={0.6} duration={1} gradientBlur="0px" className="font-medium" /> in your website is a piece of cake! You will just need to follow the steps below.
+          
+          <div className="text-lg sm:text-xl text-muted-foreground">
+            <p>
+              Integrating <ChromaInlineText text="buildinsight" delay={0.6} duration={1} gradientBlur="0px" className="font-medium" /> in your website is a piece of cake! You will just need to follow the steps below.
+            </p>
             <div className="text-sm text-muted-foreground mt-2">We promise we&apos;ll add proper documentation when we launch!</div>
-          </p>
+          </div>
           
           <Accordion type="single" collapsible className="w-full">
             {[
